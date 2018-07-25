@@ -1,5 +1,6 @@
 let express = require('express');
 let server = express();
+let cors = require('cors');
 let bodyParser = require('body-parser');
 let sql = require('mysql');
 let fs = require('fs');
@@ -16,7 +17,7 @@ let db = sql.createConnection({
 });
 
 
-
+server.use(cors({origin: '*'}));
 server.use(bodyParser.json());
 // Listen to port 8080
 server.listen(8080);
@@ -40,7 +41,6 @@ server.get('/', function(req, res){
 
 // GET items
 server.get('/api/v1/items', function(req, res){
-	res.header("Access-Control-Allow-Origin", "*");
 	
 	// Query to retrieve items from the db
 	db.query('SELECT * FROM todo;', (err, rows) => {
@@ -64,7 +64,6 @@ server.get('/api/v1/items', function(req, res){
 
 // POST items
 server.post('/api/v1/items', function(req, res){
-	res.header("Access-Control-Allow-Origin", "*");
 	let task = {description: req.body.desc};
 	
 
@@ -81,7 +80,7 @@ server.post('/api/v1/items', function(req, res){
 
 			return;
 		}
-		res.status(204);
+		res.status(201);
 		res.send(task);
 	});
 
@@ -89,7 +88,6 @@ server.post('/api/v1/items', function(req, res){
 
 // DELETE items
 server.delete('/api/v1/items', function(req, res){
-	res.header("Access-Control-Allow-Origin", "*");
 	let id = req.body.id;
 
 	db.query('DELETE FROM todo WHERE id = ?', id, (err, rows) => {
