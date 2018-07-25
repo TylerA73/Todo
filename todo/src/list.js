@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Item from './item';
 import axios from 'axios';
+import './list.css';
 
 class List extends Component {
 	constructor(props){
@@ -10,9 +11,9 @@ class List extends Component {
 			// url of the API 
 			url: 'http://localhost:8080/api/v1/items',
 			// list to store returned items from the API
-			list: null
+			list: null,
 		};
-		this.item.bind(this);
+		this.item = this.item.bind(this);
 	}
 	// when this component mounts, get the data from the API
 	componentDidMount(){
@@ -24,10 +25,10 @@ class List extends Component {
 
 	}
 	// function used to create a new Item component for each item returned by the API
-	item(description){
+	item(id, description){
 		// return the new Item component using the description as a prop
 		return(
-			<Item desc={ description }/>
+			<Item key={ id } desc={ description } id={ id }/>
 		);
 	}
 	render(){
@@ -39,12 +40,19 @@ class List extends Component {
 		// loop through the list
 		for(let item in list){
 			// push a new component to the items array
-			items.push(this.item(list[item]["description"]));
+			items.push(
+				this.item(
+					list[item]["id"],
+					list[item]["description"]
+				)
+			);
 		}
 		return(
-			<ol>
-				{ items }
-			</ol>
+			<div className="card">
+				<ul className="list-group">
+					{ items }
+				</ul>
+			</div>
 		);
 	}
 
