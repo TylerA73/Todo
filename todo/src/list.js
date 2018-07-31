@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Item from './item';
 import axios from 'axios';
+import './list.css';
 
 class List extends Component {
 	constructor(props){
@@ -10,41 +11,63 @@ class List extends Component {
 			// url of the API 
 			url: 'http://localhost:8080/api/v1/items',
 			// list to store returned items from the API
-			list: null
+			list: null,
 		};
-		this.item.bind(this);
+		this.item = this.item.bind(this);
+		this.makeList = this.makeList.bind(this);
+		this.getList = this.getList.bind(this);
 	}
 	// when this component mounts, get the data from the API
 	componentDidMount(){
+		this.getList();
+	}
+	getList(){
 		// store the data in the list state variable
 		// log the error to the console if this cannot be done
 		axios.get(this.state.url)
-			 .then(response => this.setState({ list: response.data }))
-			 .catch(error => console.log(error));
-
+			 .then(response => {
+			 	this.makeList(response.data)
+			 }).catch(error => console.log(error));
 	}
 	// function used to create a new Item component for each item returned by the API
-	item(description){
+	item(id, description, remove){
 		// return the new Item component using the description as a prop
 		return(
-			<Item desc={ description }/>
+			<Item 
+				key={ id } 
+				desc={ description } 
+				id={ id }
+				remove={this.getList}
+			/>
 		);
 	}
-	render(){
+	makeList(todoList){
 
-		// empty array of items that will be populated with Item components
 		let items = [];
-		// use the list state variable
-		let list = this.state.list;
 		// loop through the list
-		for(let item in list){
+		for(let item in todoList){
 			// push a new component to the items array
-			items.push(this.item(list[item]["description"]));
+			items.push(
+
+				// create the item component
+				this.item(
+					todoList[item]["id"],
+					todoList[item]["description"],
+					item
+				)
+			);
 		}
+
+		this.setState({ list: items });
+		console.log(this.state.list);
+	}
+	render(){
 		return(
-			<ol>
-				{ items }
-			</ol>
+			<div className="card">
+				<ul className="list-group">
+					{ this.state.list }
+				</ul>
+			</div>
 		);
 	}
 
