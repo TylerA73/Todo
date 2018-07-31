@@ -18,7 +18,8 @@ class Item extends Component {
 			}
 		}).then(
 			(response) => {
-				console.log(response);
+				let index = parseInt(this.state.index);
+				this.props.remove();
 			}
 		).catch(
 			(error) => {console.log(error)}

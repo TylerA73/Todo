@@ -14,43 +14,58 @@ class List extends Component {
 			list: null,
 		};
 		this.item = this.item.bind(this);
+		this.makeList = this.makeList.bind(this);
+		this.getList = this.getList.bind(this);
 	}
 	// when this component mounts, get the data from the API
 	componentDidMount(){
+		this.getList();
+	}
+	getList(){
 		// store the data in the list state variable
 		// log the error to the console if this cannot be done
 		axios.get(this.state.url)
-			 .then(response => this.setState({ list: response.data }))
-			 .catch(error => console.log(error));
-
+			 .then(response => {
+			 	this.makeList(response.data)
+			 }).catch(error => console.log(error));
 	}
 	// function used to create a new Item component for each item returned by the API
-	item(id, description){
+	item(id, description, remove){
 		// return the new Item component using the description as a prop
 		return(
-			<Item key={ id } desc={ description } id={ id }/>
+			<Item 
+				key={ id } 
+				desc={ description } 
+				id={ id }
+				remove={this.getList}
+			/>
 		);
 	}
-	render(){
+	makeList(todoList){
 
-		// empty array of items that will be populated with Item components
 		let items = [];
-		// use the list state variable
-		let list = this.state.list;
 		// loop through the list
-		for(let item in list){
+		for(let item in todoList){
 			// push a new component to the items array
 			items.push(
+
+				// create the item component
 				this.item(
-					list[item]["id"],
-					list[item]["description"]
+					todoList[item]["id"],
+					todoList[item]["description"],
+					item
 				)
 			);
 		}
+
+		this.setState({ list: items });
+		console.log(this.state.list);
+	}
+	render(){
 		return(
 			<div className="card">
 				<ul className="list-group">
-					{ items }
+					{ this.state.list }
 				</ul>
 			</div>
 		);
