@@ -70,22 +70,40 @@ server.post('/api/v1/items', function(req, res){
 
 	// Query to insert into the db
 	db.query('INSERT INTO todo SET ?', task, (err, rows) => {
+		let body;
 
 		// If there is an error, return with a bad request status code
 		if(err){
 
 			res.status(400)
-			res.send({
+			body = {
 				code: 400,
 				description: "Bad Request"
-			});
+			}
+
+			res.send(body);
 
 			console.log(err);
-				
-			return;
 		}
-		res.status(201);
-		res.send(task);
+
+		db.query('SELECT * FROM todo;', (err, rows) => {
+			if(err){
+				res.status(400);
+				body = {
+					code: 400,
+					description: "Bad Request"
+				}
+
+				res.send(body);
+
+				console.log(err);
+			}else{
+				res.status(200);
+
+				body = rows;
+				res.send(body);
+			}
+		});
 	});
 
 });
