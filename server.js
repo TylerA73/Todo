@@ -20,12 +20,13 @@ let db = sql.createConnection({
 server.use(cors({origin: '*'}));
 server.use(bodyParser.json());
 // Listen to port 8080
-server.listen(8080);
+server.listen(8081);
 
 // Connect to the database
 db.connect((err) => {
 	if(err){
 		console.log("Could not connect to database");
+		console.log(err.toString());
 		return;
 	}
 
@@ -72,12 +73,15 @@ server.post('/api/v1/items', function(req, res){
 
 		// If there is an error, return with a bad request status code
 		if(err){
+
 			res.status(400)
 			res.send({
 				code: 400,
 				description: "Bad Request"
 			});
 
+			console.log(err);
+				
 			return;
 		}
 		res.status(201);
@@ -92,7 +96,7 @@ server.delete('/api/v1/items', function(req, res){
 
 	db.query('DELETE FROM todo WHERE id = ?', id, (err, rows) => {
 		if(err){
-			res.status(400)
+			res.status(400);
 			res.send({
 				code: 400,
 				description: "Bad Request"
@@ -104,6 +108,28 @@ server.delete('/api/v1/items', function(req, res){
 		res.send({
 			code: 200,
 			description: "Deleted"
+		});
+	});
+});
+
+server.put('/api/v1/items/complete', function(req, res){
+	let id = req.body.id;
+
+	db.query('UPDATE todo SET completed=1 WHERE id = ?', id, (err, rows) => {
+		if(err){
+			console.log(err);
+			res.status(400);
+			res.send({
+				code: 400,
+				description: "Bad Request"
+			});
+
+			return;
+		}
+
+		res.send({
+			code: 200,
+			description: "Item updated"
 		});
 	});
 });
